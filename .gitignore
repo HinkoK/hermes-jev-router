@@ -1,0 +1,5 @@
+eval/cache/
+__pycache__/
+*.pyc
+tools/compare_results/
+tools/limit_results/

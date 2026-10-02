@@ -1,0 +1,58 @@
+name: jev-router
+version: 1.0.0
+manifest_version: 2
+api_version: 1
+description: "Jev picks the model for every message: light tasks to the cheap model, ordinary work to the middle one, hard multi-step problems to the strongest. /router on|off|light|standard|heavy|log|check|stats. Off until you turn it on."
+author: "HinkoK (based on AlphaPerseii3000/jev-router, MIT)"
+license: MIT
+tags: [routing, models, decisions, jev, typesafe]
+provides_hooks:
+  - on_session_end
+  - post_api_request
+  - transform_llm_output
+requires_env:
+  - name: OPENROUTER_API_KEY
+    description: "Key for Jev through OpenRouter (or set TYPESAFE_API_KEY to call TypeSafe directly). ~$0.00005 per decision."
+    url: https://openrouter.ai/settings/keys
+    secret: true
+config_schema:
+  mode:
+    type: str
+    default: "off"
+    label: "on = Jev chooses; off; or pin a tier: light / standard / heavy"
+  max_tier:
+    type: str
+    default: ""
+    label: "Never route above this tier (light / standard / heavy); empty = no cap"
+  models:
+    type: dict
+    default: {}
+    label: "Per provider and tier model ids, e.g. {openai-codex: {light: gpt-6-luna}}; defaults cover openai-codex and openrouter"
+  show_model:
+    type: bool
+    default: true
+    label: "Append 'Ответила: <model>' to routed replies"
+  log_text:
+    type: bool
+    default: false
+    label: "Store the first 80 characters of each message in the journal (off: only length)"
+  skip_platforms:
+    type: list
+    default: [cron]
+    label: "Platforms that are never routed"
+  timeout_s:
+    type: float
+    default: 4.0
+    label: "Jev timeout; on timeout the chat model answers"
+  heavy_at:
+    type: float
+    default: 0.45
+    label: "Decision threshold for heavy (lower = more heavy)"
+  light_at:
+    type: float
+    default: 0.55
+    label: "Decision threshold for light (higher = fewer light)"
+  max_output_tokens:
+    type: int
+    default: 8192
+    label: "OpenRouter only: cap on max_tokens for routed requests (limits the up-front reservation)"
